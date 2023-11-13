@@ -1,1 +1,77 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁截圖與 Line Notify</title>
+</head>
+<body>
+    <h1>我的網頁</h1>
+    <!-- 用於顯示截圖的Canvas元素 -->
+    <canvas id="screenshotCanvas" width="800" height="600"></canvas>
+    <button onclick="captureScreenshot()">截圖並發送到 Line Notify</button>
+
+    <script>
+        function captureScreenshot() {
+            // 獲取Canvas元素
+            var canvas = document.getElementById('screenshotCanvas');
+            var context = canvas.getContext('2d');
+
+            // 獲取整個網頁的寬度和高度
+            var width = document.documentElement.scrollWidth;
+            var height = document.documentElement.scrollHeight;
+
+            // 將Canvas的尺寸設置為整個網頁的尺寸
+            canvas.width = width;
+            canvas.height = height;
+
+            // 清空Canvas
+            context.clearRect(0, 0, width, height);
+
+            // 在Canvas上繪製整個網頁
+            context.drawWindow(window, 0, 0, width, height, "rgb(255,255,255)");
+
+            // 將Canvas的內容轉為DataURL
+            var screenshotDataUrl = canvas.toDataURL('image/png');
+
+            // 使用Line Notify API傳送截圖
+            sendLineNotify(screenshotDataUrl);
+        }
+
+        function sendLineNotify(imageDataUrl) {
+            // 請替換成你的 Line Notify 存取權杖
+            var accessToken = 'YOUR_LINE_NOTIFY_ACCESS_TOKEN';
+
+            // 建立一個FormData對象
+            var formData = new FormData();
+            formData.append('message', '網頁截圖'); // 訊息標題
+            formData.append('imageFile', dataURLtoFile(imageDataUrl, 'screenshot.png')); // 將DataURL轉換為檔案
+
+            // 使用Fetch API發送POST請求
+            fetch('https://notify-api.line.me/api/notify', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Line Notify 發送失敗', error));
+        }
+
+        function dataURLtoFile(dataurl, filename) {
+            var arr = dataurl.split(',');
+            var mime = arr[0].match(/:(.*?);/)[1];
+            var bstr = atob(arr[1]);
+            var n = bstr.length;
+            var u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], filename, { type: mime });
+        }
+    </script>
+</body>
+</html>
